@@ -8,7 +8,7 @@ The dashboard has four page buttons:
 - `Graduate Students` shows names from `graduate-students-data.js`. Add strings or `{ name, program }` objects to that file.
 - `Signage` has a scrollable, two-column image picker and a large preview panel. Select an image to open it in the preview. The preview uses a 1728 × 972 (16:9) canvas and scales down to fit the available screen. Each `signage.json` item has a display title and an image URL.
 - `Building Map` shows Floor 1, Floor 2, and Floor 3 selectors. Add the corresponding images at `assets/building-map-floor-1.png`, `assets/building-map-floor-2.png`, and `assets/building-map-floor-3.png`.
-- `BYUTv Live` embeds the BYUtv live stream in the dashboard content area.
+- `BYUTv Live` embeds the BYUtv live stream at 1920 × 1080 pixels. The page scrolls if the display is smaller than the iframe.
 
 Signage entries use this format:
 
