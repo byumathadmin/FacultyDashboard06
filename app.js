@@ -246,6 +246,7 @@ function renderFloorList() {
 function showPage(page) {
   state.page = page;
   dashboard.classList.toggle("is-byutv-page", page === "byutv");
+  dashboard.classList.toggle("is-signage-page", page === "signage");
   const pageNames = { faculty: "Faculty", graduate: "Graduate Students", signage: "Signage", building: "Building Map", byutv: "BYUTv Live" };
   currentPageLabel.textContent = pageNames[page] || "Faculty";
   currentPageLabel.classList.remove("is-entering");
