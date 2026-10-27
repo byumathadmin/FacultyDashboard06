@@ -1,6 +1,7 @@
 const state = {
   faculty: [],
   facultyLoaded: false,
+  signage: [],
   page: "faculty",
   selectedFloor: 1,
   darkTiles: true,
@@ -29,6 +30,7 @@ const iframeLoading = document.querySelector("#iframeLoading");
 const modalTitle = document.querySelector("#modalTitle");
 const dashboard = document.querySelector("#dashboard");
 const graduateGrid = document.querySelector("#graduateGrid");
+const signageGrid = document.querySelector("#signageGrid");
 const floorList = document.querySelector("#floorList");
 const floorViewer = document.querySelector("#floorViewer");
 
@@ -183,6 +185,33 @@ function renderGraduatePage() {
     : `<div class="empty-page-state"><h3>Graduate student names are ready to be added</h3><p>Edit <code>graduate-students-data.js</code> with entries such as <code>{ name: "Student Name", program: "M.S. Mathematics", "Link to Picture": "https://example.edu/photo.jpg", Email: "student@example.edu", Office: "Room 123", "Office Hours": { "Appointment Note": "(or by appointment)", "Entries": [{ "Day": "Tuesday", "Time": "2 - 4 PM" }] } }</code>.</p></div>`;
 }
 
+function renderSignagePage(message = "") {
+  if (message) {
+    signageGrid.innerHTML = `<div class="empty-page-state"><h3>Signage images could not be loaded</h3><p>${escapeHtml(message)}</p></div>`;
+    return;
+  }
+  signageGrid.innerHTML = state.signage.length
+    ? state.signage.map(({ title, url }) => `<article class="signage-card"><img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"><h2>${escapeHtml(title)}</h2></article>`).join("")
+    : `<div class="empty-page-state"><h3>No signage images are listed</h3><p>Add items with a <code>title</code> and <code>url</code> to <code>signage.json</code>.</p></div>`;
+}
+
+async function loadSignage() {
+  try {
+    const response = await fetch("signage.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`signage.json returned ${response.status}`);
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("signage.json must contain an array of signage items.");
+    state.signage = data
+      .filter((item) => item && typeof item.title === "string" && typeof item.url === "string")
+      .map((item) => ({ title: item.title.trim(), url: item.url.trim() }))
+      .filter((item) => item.title && /^https?:\/\//i.test(item.url));
+    renderSignagePage();
+  } catch (error) {
+    console.error(error);
+    renderSignagePage("Open the hosted dashboard or run this folder through a local web server to load signage.json.");
+  }
+}
+
 function renderFloorViewer() {
   const floor = buildingFloors.find((item) => item.id === state.selectedFloor) || buildingFloors[0];
   floorViewer.innerHTML = `<div class="floor-viewer-heading"><p class="eyebrow">Selected floor</p><h3>${escapeHtml(floor.label)}</h3></div>
@@ -205,7 +234,7 @@ function renderFloorList() {
 
 function showPage(page) {
   state.page = page;
-  const pageNames = { faculty: "Faculty", graduate: "Graduate Students", building: "Building Map" };
+  const pageNames = { faculty: "Faculty", graduate: "Graduate Students", signage: "Signage", building: "Building Map" };
   currentPageLabel.textContent = pageNames[page] || "Faculty";
   currentPageLabel.classList.remove("is-entering");
   void currentPageLabel.offsetWidth;
@@ -307,6 +336,8 @@ document.addEventListener("keydown", (event) => {
 });
 
 renderGraduatePage();
+renderSignagePage();
 renderFloorList();
 showPage("faculty");
 loadFaculty();
+loadSignage();

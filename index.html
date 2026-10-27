@@ -18,6 +18,7 @@
           <p class="section-label">Pages</p>
           <button class="page-button is-active" type="button" data-page="faculty">Faculty</button>
           <button class="page-button" type="button" data-page="graduate">Graduate Students</button>
+          <button class="page-button" type="button" data-page="signage">Signage</button>
           <button class="page-button" type="button" data-page="building">Building Map</button>
           <div class="floor-navigation" id="floorNavigation" hidden>
             <p class="section-label">Floors</p>
@@ -38,6 +39,10 @@
 
         <section class="content-page" id="graduatePage" data-page-content="graduate" hidden>
           <div class="graduate-grid" id="graduateGrid" aria-live="polite"></div>
+        </section>
+
+        <section class="content-page" id="signagePage" data-page-content="signage" hidden>
+          <div class="signage-grid" id="signageGrid" aria-live="polite"></div>
         </section>
 
         <section class="content-page" id="buildingPage" data-page-content="building" hidden>

@@ -2,11 +2,22 @@
 
 The dashboard can be opened directly as a local file. It uses `faculty-data.js` for the Faculty page when `file://` blocks JSON fetches, and falls back to `faculty.json` when served over HTTP.
 
-The dashboard has three page buttons:
+The dashboard has four page buttons:
 
 - `Faculty` shows the clickable faculty tiles.
 - `Graduate Students` shows names from `graduate-students-data.js`. Add strings or `{ name, program }` objects to that file.
+- `Signage` shows the linked images in `signage.json`. Each item has a display title and an image URL.
 - `Building Map` shows Floor 1, Floor 2, and Floor 3 selectors. Add the corresponding images at `assets/building-map-floor-1.png`, `assets/building-map-floor-2.png`, and `assets/building-map-floor-3.png`.
+
+Signage entries use this format:
+
+```json
+[
+  { "title": "Math Lab Tutoring Presentation", "url": "https://example.edu/signage-slide.png" }
+]
+```
+
+The Signage page fetches `signage.json`, so it is available on GitHub Pages or when the folder is served locally. Direct `file://` use cannot fetch the JSON file in browsers that block local-file requests.
 
 It can also be run through a web server; this is how it should be hosted on GitHub Pages:
 

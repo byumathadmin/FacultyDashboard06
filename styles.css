@@ -186,6 +186,10 @@ button, input, .faculty-card { cursor: pointer; }
 .page-heading h2 { margin: 0; color: var(--ink); font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4vw, 48px); line-height: 1; letter-spacing: -.055em; }
 .page-intro { max-width: 620px; margin: 16px 0 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
 .graduate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.signage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); align-items: start; gap: 22px; }
+.signage-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.signage-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #071b3a; }
+.signage-card h2 { margin: 0; padding: 14px 18px 16px; color: var(--ink); font-family: "Space Grotesk", sans-serif; font-size: 17px; line-height: 1.2; }
 .graduate-card { --tile-muted: #d9e8f3; display: flex; min-height: 130px; color: var(--tile-ink); gap: 16px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--tile-bg); box-shadow: var(--shadow); }
 .graduate-portrait { flex: 0 0 88px; width: 88px; height: 104px; border-radius: 12px; background: #e5eaec; object-fit: cover; object-position: center top; }
 .graduate-info { min-width: 0; flex: 1; }
