@@ -42,7 +42,16 @@
         </section>
 
         <section class="content-page" id="signagePage" data-page-content="signage" hidden>
-          <div class="signage-grid" id="signageGrid" aria-live="polite"></div>
+          <div class="signage-layout">
+            <div class="signage-picker-column">
+              <p class="signage-column-label">Choose a slide</p>
+              <div class="signage-grid" id="signageGrid" aria-label="Signage images"></div>
+            </div>
+            <section class="signage-viewer-column" aria-label="Signage preview">
+              <p class="signage-column-label">Preview · 1728 × 972</p>
+              <div class="signage-viewer" id="signageViewer" aria-live="polite"></div>
+            </section>
+          </div>
         </section>
 
         <section class="content-page" id="buildingPage" data-page-content="building" hidden>

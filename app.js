@@ -2,6 +2,7 @@ const state = {
   faculty: [],
   facultyLoaded: false,
   signage: [],
+  selectedSignageIndex: 0,
   page: "faculty",
   selectedFloor: 1,
   darkTiles: true,
@@ -31,6 +32,7 @@ const modalTitle = document.querySelector("#modalTitle");
 const dashboard = document.querySelector("#dashboard");
 const graduateGrid = document.querySelector("#graduateGrid");
 const signageGrid = document.querySelector("#signageGrid");
+const signageViewer = document.querySelector("#signageViewer");
 const floorList = document.querySelector("#floorList");
 const floorViewer = document.querySelector("#floorViewer");
 
@@ -188,11 +190,20 @@ function renderGraduatePage() {
 function renderSignagePage(message = "") {
   if (message) {
     signageGrid.innerHTML = `<div class="empty-page-state"><h3>Signage images could not be loaded</h3><p>${escapeHtml(message)}</p></div>`;
+    signageViewer.innerHTML = `<div class="signage-viewer-empty">Signage preview will appear here.</div>`;
     return;
   }
-  signageGrid.innerHTML = state.signage.length
-    ? state.signage.map(({ title, url }) => `<article class="signage-card"><img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"><h2>${escapeHtml(title)}</h2></article>`).join("")
-    : `<div class="empty-page-state"><h3>No signage images are listed</h3><p>Add items with a <code>title</code> and <code>url</code> to <code>signage.json</code>.</p></div>`;
+  if (!state.signage.length) {
+    signageGrid.innerHTML = `<div class="empty-page-state"><h3>No signage images are listed</h3><p>Add items with a <code>title</code> and <code>url</code> to <code>signage.json</code>.</p></div>`;
+    signageViewer.innerHTML = `<div class="signage-viewer-empty">Add images to signage.json to see a preview.</div>`;
+    return;
+  }
+
+  state.selectedSignageIndex = Math.min(state.selectedSignageIndex, state.signage.length - 1);
+  signageGrid.innerHTML = state.signage.map(({ title, url }, index) => `<button class="signage-card${index === state.selectedSignageIndex ? " is-selected" : ""}" type="button" data-signage-index="${index}" aria-pressed="${index === state.selectedSignageIndex}" aria-label="Preview ${escapeHtml(title)}"><img src="${escapeHtml(url)}" alt="" loading="lazy" decoding="async"><span>${escapeHtml(title)}</span></button>`).join("");
+
+  const selected = state.signage[state.selectedSignageIndex];
+  signageViewer.innerHTML = `<div class="signage-preview-frame"><img src="${escapeHtml(selected.url)}" alt="${escapeHtml(selected.title)}" decoding="async"></div><h2>${escapeHtml(selected.title)}</h2>`;
 }
 
 async function loadSignage() {
@@ -309,6 +320,13 @@ floorList.addEventListener("click", (event) => {
   if (!button) return;
   state.selectedFloor = Number(button.dataset.floor);
   renderFloorList();
+});
+
+signageGrid.addEventListener("click", (event) => {
+  const card = event.target.closest("[data-signage-index]");
+  if (!card) return;
+  state.selectedSignageIndex = Number(card.dataset.signageIndex);
+  renderSignagePage();
 });
 
 grid.addEventListener("click", (event) => {
