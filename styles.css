@@ -182,8 +182,8 @@ button, input, .faculty-card { cursor: pointer; }
 
 .content-page { max-width: 1180px; }
 #buildingPage { max-width: none; }
-.byutv-page { width: 1920px; max-width: none; height: 1080px; min-height: 1080px; overflow: hidden; border-radius: 14px; background: #000; }
-.byutv-frame { display: block; width: 1920px; height: 1080px; border: 0; background: #000; }
+.byutv-page { width: 2500px; max-width: none; height: 1300px; min-height: 1080px; overflow: hidden; border-radius: 14px; background: #000; }
+.byutv-frame { display: block; width: 2500px; height: 1300px; border: 0; background: #000; }
 .page-heading { margin: 0 0 32px; }
 .page-heading h2 { margin: 0; color: var(--ink); font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4vw, 48px); line-height: 1; letter-spacing: -.055em; }
 .page-intro { max-width: 620px; margin: 16px 0 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
