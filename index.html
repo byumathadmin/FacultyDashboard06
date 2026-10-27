@@ -20,6 +20,7 @@
           <button class="page-button" type="button" data-page="graduate">Graduate Students</button>
           <button class="page-button" type="button" data-page="signage">Signage</button>
           <button class="page-button" type="button" data-page="building">Building Map</button>
+          <button class="page-button" type="button" data-page="byutv">BYUTv Live</button>
           <div class="floor-navigation" id="floorNavigation" hidden>
             <p class="section-label">Floors</p>
             <div class="floor-list" id="floorList" role="tablist" aria-label="Building floors"></div>
@@ -58,6 +59,16 @@
           <div class="building-map-layout">
             <div class="floor-viewer" id="floorViewer" role="tabpanel" aria-live="polite"></div>
           </div>
+        </section>
+
+        <section class="content-page byutv-page" id="byutvPage" data-page-content="byutv" hidden>
+          <iframe
+            class="byutv-frame"
+            src="https://www.byutv.org/live?player-open=true&amp;isLivestream=true&amp;channel=byutv"
+            title="BYUtv Live"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            allowfullscreen>
+          </iframe>
         </section>
       </main>
     </div>

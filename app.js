@@ -245,7 +245,7 @@ function renderFloorList() {
 
 function showPage(page) {
   state.page = page;
-  const pageNames = { faculty: "Faculty", graduate: "Graduate Students", signage: "Signage", building: "Building Map" };
+  const pageNames = { faculty: "Faculty", graduate: "Graduate Students", signage: "Signage", building: "Building Map", byutv: "BYUTv Live" };
   currentPageLabel.textContent = pageNames[page] || "Faculty";
   currentPageLabel.classList.remove("is-entering");
   void currentPageLabel.offsetWidth;
