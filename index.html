@@ -8,7 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link id="dashboardStyles" rel="stylesheet" href="styles.css" />
+    <script>
+      const kioskRefreshToken = new URLSearchParams(window.location.search).get("kioskRefresh");
+      if (kioskRefreshToken) {
+        const stylesheetUrl = new URL(document.querySelector("#dashboardStyles").href);
+        stylesheetUrl.searchParams.set("kioskRefresh", kioskRefreshToken);
+        document.querySelector("#dashboardStyles").href = stylesheetUrl;
+      }
+    </script>
   </head>
   <body>
     <div class="app-shell">
@@ -20,7 +28,12 @@
           <button class="page-button" type="button" data-page="graduate">Graduate Students</button>
           <button class="page-button" type="button" data-page="signage">Signage</button>
           <button class="page-button" type="button" data-page="building">Building Map</button>
-          <button class="page-button" type="button" data-page="byutv">BYUTv Live</button>
+          <div class="byutv-nav-controls" aria-label="BYUTv controls">
+            <button class="page-button" type="button" data-page="byutv">BYUTv</button>
+            <button class="page-button refresh-button" type="button" id="refreshDashboard" aria-label="Refresh dashboard content from the hosted site" title="Refresh dashboard content">
+              <span aria-hidden="true">↻</span> Refresh
+            </button>
+          </div>
           <div class="floor-navigation" id="floorNavigation" hidden>
             <p class="section-label">Floors</p>
             <div class="floor-list" id="floorList" role="tablist" aria-label="Building floors"></div>
@@ -75,6 +88,33 @@
       </main>
     </div>
 
+    <div class="pin-gate-backdrop" id="pinGateBackdrop" hidden>
+      <section class="pin-gate" role="dialog" aria-modal="true" aria-labelledby="pinGateTitle" aria-describedby="pinGateMessage" tabindex="-1">
+        <p class="eyebrow">Restricted page</p>
+        <h2 id="pinGateTitle">Enter PIN to open BYUTv</h2>
+        <p class="pin-display" id="pinDisplay" aria-label="0 digits entered">○ ○ ○ ○</p>
+        <p class="pin-message" id="pinGateMessage" aria-live="polite">Use the keypad to enter the four-digit PIN.</p>
+        <div class="pin-keypad" id="pinKeypad" aria-label="PIN keypad">
+          <button type="button" data-pin-key="1">1</button>
+          <button type="button" data-pin-key="2">2</button>
+          <button type="button" data-pin-key="3">3</button>
+          <button type="button" data-pin-key="4">4</button>
+          <button type="button" data-pin-key="5">5</button>
+          <button type="button" data-pin-key="6">6</button>
+          <button type="button" data-pin-key="7">7</button>
+          <button type="button" data-pin-key="8">8</button>
+          <button type="button" data-pin-key="9">9</button>
+          <button class="pin-action" type="button" data-pin-action="clear">Clear</button>
+          <button type="button" data-pin-key="0">0</button>
+          <button class="pin-action" type="button" data-pin-action="backspace" aria-label="Delete last digit">⌫</button>
+        </div>
+        <div class="pin-gate-actions">
+          <button type="button" class="pin-cancel" id="pinCancel">Cancel</button>
+          <button type="button" class="pin-submit" id="pinSubmit" disabled>Continue</button>
+        </div>
+      </section>
+    </div>
+
     <div class="modal-backdrop" id="modalBackdrop" hidden>
       <section class="website-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
         <div class="modal-header">
@@ -104,9 +144,12 @@
       </section>
     </div>
 
-    <script src="Fac_Website/profile-manifest.js"></script>
-    <script src="faculty-data.js"></script>
-    <script src="graduate-students-data.js"></script>
-    <script src="app.js" defer></script>
+    <script>
+      const refreshSuffix = kioskRefreshToken ? `?kioskRefresh=${encodeURIComponent(kioskRefreshToken)}` : "";
+      document.write(`<script src="Fac_Website/profile-manifest.js${refreshSuffix}"><\/script>`);
+      document.write(`<script src="faculty-data.js${refreshSuffix}"><\/script>`);
+      document.write(`<script src="graduate-students-data.js${refreshSuffix}"><\/script>`);
+      document.write(`<script src="app.js${refreshSuffix}"><\/script>`);
+    </script>
   </body>
 </html>

@@ -35,6 +35,20 @@ const signageGrid = document.querySelector("#signageGrid");
 const signageViewer = document.querySelector("#signageViewer");
 const floorList = document.querySelector("#floorList");
 const floorViewer = document.querySelector("#floorViewer");
+const pinGateBackdrop = document.querySelector("#pinGateBackdrop");
+const pinGate = document.querySelector(".pin-gate");
+const pinDisplay = document.querySelector("#pinDisplay");
+const pinGateMessage = document.querySelector("#pinGateMessage");
+const pinSubmit = document.querySelector("#pinSubmit");
+const pinCancel = document.querySelector("#pinCancel");
+const pinKeypad = document.querySelector("#pinKeypad");
+const refreshDashboard = document.querySelector("#refreshDashboard");
+const byutvPin = "2459";
+let enteredPin = "";
+let previousFocus = null;
+let inactivityTimeout = null;
+const autoReturnPages = new Set(["graduate", "signage", "building"]);
+const inactivityDelay = 60_000;
 
 const buildingFloors = [
   { id: 1, label: "Floor 1", image: "assets/building-map-floor-1.png" },
@@ -259,12 +273,67 @@ function showPage(page) {
       ? !belongsToPage || state.facultyLoaded
       : !belongsToPage;
   });
-  document.querySelectorAll(".page-button").forEach((button) => {
+  document.querySelectorAll(".page-button[data-page]").forEach((button) => {
     const active = button.dataset.page === page;
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-current", active ? "page" : "false");
   });
   dashboard.scrollTo({ top: 0, behavior: "smooth" });
+  resetInactivityTimer();
+}
+
+function resetInactivityTimer() {
+  window.clearTimeout(inactivityTimeout);
+  inactivityTimeout = null;
+  if (!autoReturnPages.has(state.page)) return;
+
+  inactivityTimeout = window.setTimeout(() => {
+    if (!autoReturnPages.has(state.page)) return;
+    if (!pinGateBackdrop.hidden) closePinGate();
+    showPage("faculty");
+  }, inactivityDelay);
+}
+
+function updatePinDisplay() {
+  const dots = Array.from({ length: 4 }, (_, index) => index < enteredPin.length ? "●" : "○").join(" ");
+  pinDisplay.textContent = dots;
+  pinDisplay.setAttribute("aria-label", `${enteredPin.length} of 4 digits entered`);
+  pinSubmit.disabled = enteredPin.length !== 4;
+}
+
+function openPinGate() {
+  enteredPin = "";
+  previousFocus = document.activeElement;
+  pinGateMessage.textContent = "Use the keypad to enter the four-digit PIN.";
+  updatePinDisplay();
+  pinGateBackdrop.hidden = false;
+  pinGate.focus();
+}
+
+function closePinGate() {
+  pinGateBackdrop.hidden = true;
+  enteredPin = "";
+  updatePinDisplay();
+  if (previousFocus instanceof HTMLElement) previousFocus.focus();
+}
+
+function submitPin() {
+  if (enteredPin.length !== 4) return;
+  if (enteredPin === byutvPin) {
+    closePinGate();
+    showPage("byutv");
+    return;
+  }
+  enteredPin = "";
+  updatePinDisplay();
+  pinGateMessage.textContent = "That PIN was not correct. Try again.";
+}
+
+function handlePinKey(key) {
+  if (!/^\d$/.test(key) || enteredPin.length >= 4) return;
+  enteredPin += key;
+  pinGateMessage.textContent = "";
+  updatePinDisplay();
 }
 
 function openModal(index) {
@@ -313,8 +382,50 @@ async function loadFaculty() {
   }
 }
 
-document.querySelectorAll(".page-button").forEach((button) => {
-  button.addEventListener("click", () => showPage(button.dataset.page));
+document.querySelectorAll(".page-button[data-page]").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (button.dataset.page === "byutv") openPinGate();
+    else showPage(button.dataset.page);
+  });
+});
+
+pinKeypad.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  if (button.dataset.pinKey) handlePinKey(button.dataset.pinKey);
+  if (button.dataset.pinAction === "clear") {
+    enteredPin = "";
+    pinGateMessage.textContent = "";
+    updatePinDisplay();
+  }
+  if (button.dataset.pinAction === "backspace") {
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinDisplay();
+  }
+});
+pinSubmit.addEventListener("click", submitPin);
+pinCancel.addEventListener("click", closePinGate);
+pinGateBackdrop.addEventListener("click", (event) => {
+  if (event.target === pinGateBackdrop) closePinGate();
+});
+document.addEventListener("keydown", (event) => {
+  if (pinGateBackdrop.hidden) return;
+  if (event.key === "Escape") closePinGate();
+  else if (event.key === "Backspace") {
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinDisplay();
+  } else if (event.key === "Enter") submitPin();
+  else handlePinKey(event.key);
+});
+
+refreshDashboard.addEventListener("click", () => {
+  const refreshedUrl = new URL(window.location.href);
+  refreshedUrl.searchParams.set("kioskRefresh", String(Date.now()));
+  window.location.replace(refreshedUrl.toString());
+});
+
+["pointerdown", "pointermove", "touchstart", "keydown", "wheel"].forEach((eventName) => {
+  document.addEventListener(eventName, resetInactivityTimer, { passive: true });
 });
 
 floorList.addEventListener("click", (event) => {
