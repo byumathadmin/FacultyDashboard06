@@ -47,8 +47,10 @@ const byutvPin = "2459";
 let enteredPin = "";
 let previousFocus = null;
 let inactivityTimeout = null;
-const autoReturnPages = new Set(["graduate", "signage", "building"]);
-const inactivityDelay = 60_000;
+let rotationTimeout = null;
+const autoReturnPages = new Set(["graduate", "building"]);
+const inactivityDelay = 2 * 60_000;
+const rotationDelay = 5 * 60_000;
 
 const buildingFloors = [
   { id: 1, label: "Floor 1", image: "assets/building-map-floor-1.png" },
@@ -299,6 +301,23 @@ function resetInactivityTimer() {
   }, inactivityDelay);
 }
 
+function scheduleIdleRotation() {
+  window.clearTimeout(rotationTimeout);
+
+  rotationTimeout = window.setTimeout(() => {
+    if (!modalBackdrop.hidden) closeModal();
+    if (!pinGateBackdrop.hidden) closePinGate();
+
+    showPage(state.page === "faculty" ? "signage" : "faculty");
+    scheduleIdleRotation();
+  }, rotationDelay);
+}
+
+function handleActivity() {
+  resetInactivityTimer();
+  scheduleIdleRotation();
+}
+
 function updatePinDisplay() {
   const dots = Array.from({ length: 4 }, (_, index) => index < enteredPin.length ? "●" : "○").join(" ");
   pinDisplay.textContent = dots;
@@ -431,9 +450,11 @@ refreshDashboard.addEventListener("click", () => {
   window.location.replace(refreshedUrl.toString());
 });
 
-["pointerdown", "pointermove", "touchstart", "keydown", "wheel"].forEach((eventName) => {
-  document.addEventListener(eventName, resetInactivityTimer, { passive: true });
-});
+["pointerdown", "pointermove", "touchstart", "keydown", "wheel"].forEach(
+  (eventName) => {
+    document.addEventListener(eventName, handleActivity, { passive: true });
+  }
+);
 
 floorList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-floor]");
@@ -472,7 +493,7 @@ websiteFrame.addEventListener("load", () => {
 
     ["pointerdown", "pointermove", "touchstart", "keydown", "wheel"].forEach(
       (eventName) => {
-        iframeDocument.addEventListener(eventName, resetInactivityTimer, {
+        iframeDocument.addEventListener(eventName, handleActivity, {
           passive: true,
         });
       }
@@ -495,3 +516,4 @@ renderFloorList();
 showPage("faculty");
 loadFaculty();
 loadSignage();
+scheduleIdleRotation();
