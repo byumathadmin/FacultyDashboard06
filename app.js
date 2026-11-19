@@ -285,12 +285,17 @@ function showPage(page) {
 function resetInactivityTimer() {
   window.clearTimeout(inactivityTimeout);
   inactivityTimeout = null;
-  if (!autoReturnPages.has(state.page)) return;
+
+  const modalIsOpen = !modalBackdrop.hidden;
+  if (!autoReturnPages.has(state.page) && !modalIsOpen) return;
 
   inactivityTimeout = window.setTimeout(() => {
-    if (!autoReturnPages.has(state.page)) return;
-    if (!pinGateBackdrop.hidden) closePinGate();
-    showPage("faculty");
+    if (!modalBackdrop.hidden) closeModal();
+
+    if (autoReturnPages.has(state.page)) {
+      if (!pinGateBackdrop.hidden) closePinGate();
+      showPage("faculty");
+    }
   }, inactivityDelay);
 }
 
@@ -356,6 +361,7 @@ function openModal(index) {
   modalBackdrop.hidden = false;
   document.body.classList.add("modal-open");
   websiteModal.focus();
+  resetInactivityTimer()
 }
 
 function closeModal() {
@@ -363,6 +369,7 @@ function closeModal() {
   document.body.classList.remove("modal-open");
   websiteFrame.src = "about:blank";
   directionsImage.removeAttribute("src");
+  resetInactivityTimer()
 }
 
 async function loadFaculty() {
@@ -457,7 +464,23 @@ grid.addEventListener("keydown", (event) => {
 modalBackdrop.addEventListener("click", (event) => {
   if (event.target === modalBackdrop) closeModal();
 });
-websiteFrame.addEventListener("load", () => iframeLoading.classList.add("is-hidden"));
+websiteFrame.addEventListener("load", () => {
+  iframeLoading.classList.add("is-hidden");
+  try {
+    const iframeDocument = websiteFrame.contentDocument;
+    if (!iframeDocument) return;
+
+    ["pointerdown", "pointermove", "touchstart", "keydown", "wheel"].forEach(
+      (eventName) => {
+        iframeDocument.addEventListener(eventName, resetInactivityTimer, {
+          passive: true,
+        });
+      }
+    );
+  } catch (error) {
+    console.warn("Cannot track activity inside the faculty website.", error);
+  }
+});
 directionsImage.addEventListener("error", () => {
   directionsImage.hidden = true;
   directionsMissing.hidden = false;
