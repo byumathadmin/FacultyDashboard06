@@ -261,6 +261,17 @@ function renderFloorList() {
 
 function showPage(page) {
   state.page = page;
+
+  // byutv load when navigation to the page
+  const byutvFrame = document.querySelector(".byutv-frame");
+  if (page === "byutv") {
+    if (!byutvFrame.getAttribute("src")) {
+      byutvFrame.src = byutvFrame.dataset.src;
+    }
+  } else {
+    byutvFrame.removeAttribute("src");
+  }
+  
   dashboard.classList.toggle("is-byutv-page", page === "byutv");
   dashboard.classList.toggle("is-signage-page", page === "signage");
   const pageNames = { faculty: "Faculty", graduate: "Graduate Students", signage: "Signage", building: "Building Map", byutv: "BYUTv Live" };
@@ -282,6 +293,7 @@ function showPage(page) {
   });
   dashboard.scrollTo({ top: 0, behavior: "smooth" });
   resetInactivityTimer();
+  scheduleIdleRotation();
 }
 
 function resetInactivityTimer() {
@@ -303,6 +315,9 @@ function resetInactivityTimer() {
 
 function scheduleIdleRotation() {
   window.clearTimeout(rotationTimeout);
+
+  // Don't start the idle cycle while BYUtv is open.
+  if (state.page === "byutv") return;
 
   rotationTimeout = window.setTimeout(() => {
     if (!modalBackdrop.hidden) closeModal();
@@ -516,4 +531,3 @@ renderFloorList();
 showPage("faculty");
 loadFaculty();
 loadSignage();
-scheduleIdleRotation();
